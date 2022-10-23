@@ -1,0 +1,25 @@
+@import '~antd/dist/antd.css';
+
+.antd-input {
+    width: 400px !important;
+}
+
+.todo-content {
+    display: inline;
+    padding: 3px;
+    background: #1890ff;
+    text-decoration: line-through;
+    font-size: 16px;
+    color: #fff;
+}
+
+.content {
+    display: inline;
+    padding: 3px;
+    font-size: 16px;
+}
+
+.ant-table-cell {
+    font-weight: 500;
+    font-size: 16px;
+}
