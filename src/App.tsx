@@ -3,30 +3,22 @@ import { Input, Button, message, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import './css/index.css'
 
+/**
+ * 待办
+ */
+type TodoType = {
+  key: number
+  id: number
+  content: string
+  time: number
+  done: boolean
+}
 
 function App() {
 
-  //创建一个 TodoType 接口
-  type TodoType = {
-    key: number,
-    id: number,
-    content: string,
-    time: number,
-    done: boolean,
-    todoList?: TodoType
-  }
-
   //初始化输入框的内容 和 小li
   const [inpValue, setInpValue] = useState('')
-  const [todoList, setTodoList] = useState<Array<TodoType>>([
-    {
-      key: 1666455021112,
-      id: 1666455021112,
-      content: '敲代码',
-      time: 1666455021112,
-      done: true,
-    }
-  ])
+  const [todoList, setTodoList] = useState<Array<TodoType>>([])
 
   //实现本地存储 序列化数组
   const saveTodo = (arr: Array<TodoType>) => {
@@ -35,19 +27,21 @@ function App() {
     }
   }
 
-  //声明周期钩子
-  useEffect(() => {
-
-  })
-
   const newTime = (time: Date | number) => {
     const d = new Date(time)
+
+    const dataS = d.getDate()
+    const monthS = d.getMonth() + 1
+    const hoursS = d.getHours()
+    const minuteS = d.getMinutes()
+    const secondS = d.getSeconds()
+
     const yarn = d.getFullYear();
-    const month = (d.getMonth() + 1) < 10 ? ('0' + (d.getMonth() + 1)) : (d.getMonth() + 1);
-    const data = d.getDate() < 10 ? ('0' + d.getDate()) : (d.getDate());
-    const hours = d.getHours() < 10 ? ('0' + d.getHours()) : (d.getHours());
-    const minute = d.getMinutes() < 10 ? ('0' + d.getMinutes()) : (d.getMinutes());
-    const second = d.getSeconds() < 10 ? ('0' + d.getSeconds()) : (d.getSeconds());
+    const month = dataS < 10 ? '0' + dataS : dataS;
+    const data = monthS < 10 ? '0' + monthS : monthS;
+    const hours = hoursS < 10 ? '0' + hoursS : hoursS;
+    const minute = minuteS < 10 ? '0' + minuteS : minuteS;
+    const second = secondS < 10 ? '0' + secondS : secondS;
     return yarn + '-' + month + '-' + data + ' ' + hours + ':' + minute + ':' + second
   }
 
@@ -64,7 +58,7 @@ function App() {
       title: '时间',
       dataIndex: 'time',
       key: 'time',
-      render: ((_, todo) => {
+      render: (( _ ) => {
         return newTime(_)
       })
     },
@@ -88,16 +82,17 @@ function App() {
     if (inpValue === '') {
       return message.error('请输入内容');
     } else {
+      const time = new Date().getTime()
       const items = {
-        key: new Date().getTime(),
-        id: new Date().getTime(),
+        key: time,
+        id: time,
         content: inpValue,
-        time: new Date().getTime(),
+        time: time,
         done: false
       }
       message.success('已完成')
       setTodoList([...todoList, items]);
-    saveTodo([...todoList, items])
+      saveTodo([...todoList, items])
     };
   }
 
@@ -113,8 +108,9 @@ function App() {
           todo.done = false
         }
       };
-      setTodoList(todos)
     });
+    setTodoList(todos)
+    saveTodo(todos)
     message.warning('已完成')
   }
 
@@ -125,7 +121,20 @@ function App() {
     const newList = todos.filter(todo => todo.id !== id)
     message.error('已删除')
     setTodoList(newList)
+    saveTodo(newList)
   }
+
+  const initTodo = () => {
+    const todoListStr = localStorage.getItem('todoList');
+    if (todoListStr) {
+      const todoList = JSON.parse(todoListStr);
+      setTodoList(todoList);
+    }
+  }
+
+  useEffect(() => {
+    initTodo();
+  }, [])
 
   return (
     <>
